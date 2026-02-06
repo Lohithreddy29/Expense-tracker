@@ -1,6 +1,10 @@
 # Expense Tracker
 
+![Expense Tracker Logo](assets/logo.svg)
+
 A Flask-based personal expense tracker with features including user registration/login, transaction recording (income/expense), budgets, savings goals, recurring transactions, receipt uploads, and CSV/PDF export.
+
+![Features Illustration](assets/illustration.svg)
 
 Key files
 - `my_app.py` — main Flask application and routes (DB connection via environment variables).
