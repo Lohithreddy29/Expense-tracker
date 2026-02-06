@@ -8,6 +8,9 @@ Key files
 - `scripts/init_db.py` — helper to apply `db/schema.sql` to a SQL Server instance.
 - Tests: `conftest.py`, `test_auth.py`, `test_transactions.py` (pytest).
 
+Author
+- Lohith Reddy Danda
+
 Requirements
 - Python 3.9+
 - For production with SQL Server: Microsoft ODBC Driver 17 for SQL Server (or appropriate driver)
