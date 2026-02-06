@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <rect width="400" height="120" fill="#0b5cff" rx="12"/>
+  <g fill="#fff" font-family="Arial, Helvetica, sans-serif">
+    <text x="20" y="46" font-size="28" font-weight="700">Expense</text>
+    <text x="20" y="86" font-size="28" font-weight="400">Tracker</text>
+  </g>
+  <circle cx="340" cy="60" r="28" fill="#fff" opacity="0.12"/>
+</svg>
