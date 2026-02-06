@@ -1,0 +1,12 @@
+Flask==2.2.5
+Flask-Session==0.4.1
+pyodbc==4.0.35
+werkzeug==2.2.3
+fpdf==1.7.2
+pytest==7.4.0
+
+# Dev / CI
+black==24.3.0
+flake8==6.1.0
+isort==5.12.0
+python-dotenv==1.0.0

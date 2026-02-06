@@ -2,6 +2,8 @@
 import io
 import csv
 import pyodbc
+import sqlite3
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, session, send_file
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -29,20 +31,41 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 ## -------------DB connection--------------------
 
 def get_connection():
-    return pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=LOHITH_REDDY\\DLRSQL;'  # change as needed
-        'DATABASE=Expense_Tracker;'
-        'Trusted_Connection=yes;'
-    )
+    # Load environment variables from .env (if present)
+    load_dotenv()
+
+    engine = os.getenv("DB_ENGINE", "mssql").lower()
+    if engine == "sqlite":
+        db_path = os.getenv("DB_PATH", "expense_tracker.db")
+        conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    # Default: use pyodbc to connect to SQL Server
+    # Allow providing a full connection string via DB_CONNECTION env var
+    conn_str = os.getenv("DB_CONNECTION")
+    if conn_str:
+        return pyodbc.connect(conn_str)
+
+    driver = os.getenv("DB_DRIVER", "{ODBC Driver 17 for SQL Server}")
+    server = os.getenv("DB_SERVER", "LOHITH_REDDY\\DLRSQL")
+    database = os.getenv("DB_DATABASE", "Expense_Tracker")
+    trusted = os.getenv("DB_TRUSTED", "yes").lower() in ("yes", "true", "1")
+
+    if trusted:
+        return pyodbc.connect(f"DRIVER={driver};SERVER={server};DATABASE={database};Trusted_Connection=yes;")
+    else:
+        user = os.getenv("DB_USER")
+        password = os.getenv("DB_PASSWORD")
+        return pyodbc.connect(f"DRIVER={driver};SERVER={server};DATABASE={database};UID={user};PWD={password}")
 
 @contextmanager
 def get_cursor():
     conn = get_connection()
-    cursor = conn.cursor()
     try:
+        cursor = conn.cursor()
         yield cursor
-        cursor.connection.commit()
+        conn.commit()
     finally:
         conn.close()
 
