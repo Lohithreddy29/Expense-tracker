@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  RUN_TESTS: 'false' # Set to 'true' in repo settings to run tests (requires DB)
+  RUN_TESTS: 'true' # Tests run in CI using SQLite (no external DB required)
 
 jobs:
   lint:
@@ -28,7 +28,6 @@ jobs:
         run: flake8 .
 
   test:
-    if: ${{ env.RUN_TESTS == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,9 +35,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install dependencies
+      - name: Install dependencies for tests
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run pytest
+          pip install -r requirements-ci.txt
+      - name: Run tests (SQLite)
+        env:
+          DB_ENGINE: sqlite
+          DB_PATH: ':memory:'
         run: pytest -q

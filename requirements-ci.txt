@@ -1,0 +1,11 @@
+Flask
+Flask-Session
+werkzeug
+fpdf
+pytest
+python-dotenv
+
+# Dev tools for linting
+black
+flake8
+isort

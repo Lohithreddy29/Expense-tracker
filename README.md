@@ -1,18 +1,24 @@
 # Expense Tracker
 
-A Flask-based personal expense tracker that uses SQL Server (via `pyodbc`) for storage. Features include user registration/login, transaction recording (income/expense), budgets, savings goals, recurring transactions, receipts upload, and CSV/PDF export.
+A Flask-based personal expense tracker with features including user registration/login, transaction recording (income/expense), budgets, savings goals, recurring transactions, receipt uploads, and CSV/PDF export.
 
-Key files:
-- `my_app.py` — main Flask application and routes (DB connection in `get_connection()`).
-- `conftest.py`, `test_auth.py`, `test_transactions.py` — pytest fixtures and tests.
+Key files
+- `my_app.py` — main Flask application and routes (DB connection via environment variables).
+- `db/schema.sql` — starter SQL Server schema.
+- `scripts/init_db.py` — helper to apply `db/schema.sql` to a SQL Server instance.
+- Tests: `conftest.py`, `test_auth.py`, `test_transactions.py` (pytest).
 
 Requirements
 - Python 3.9+
-- Microsoft ODBC Driver 17 for SQL Server (or appropriate driver)
-- A running SQL Server instance and an `Expense_Tracker` database (or update connection string)
-- Python packages: `Flask`, `Flask-Session`, `pyodbc`, `werkzeug`, `fpdf`, `pytest`
+- For production with SQL Server: Microsoft ODBC Driver 17 for SQL Server (or appropriate driver)
+- A SQL Server instance for production (or use Docker compose locally)
 
-Quick setup
+Files for dependency management
+- `requirements.txt` — lightweight list used for local installs.
+- `requirements-pinned.txt` — recommended pinned versions.
+- `requirements-ci.txt` — CI/test dependencies (excludes `pyodbc` so tests run in CI using SQLite).
+
+Quick setup (local, Python)
 1. Create and activate a virtual environment:
 
 ```powershell
@@ -21,18 +27,22 @@ python -m venv .venv
 # or .\.venv\Scripts\activate   # cmd.exe
 ```
 
-2. Install dependencies (example):
+2. Install dependencies:
 
 ```powershell
-pip install Flask Flask-Session pyodbc werkzeug fpdf pytest
+pip install -r requirements.txt
 ```
 
-3. Configure the database connection in `my_app.py` — update the `SERVER` and `DATABASE` values in `get_connection()` to match your SQL Server instance and credentials.
+3. Copy `.env.example` to `.env` and update values (DB connection, `APP_SECRET`, etc.).
 
-4. Ensure the required tables exist. The tests and app expect tables such as `users`, `transactions`, `categories`, `user_accounts`, `budgets`, `savings_goals`, `recurring_transactions`, etc. You can adapt your schema from the app's SQL usage.
+4. If using SQL Server, initialize the DB schema:
+
+```powershell
+python scripts/init_db.py
+```
 
 Running the app
-- With Flask (recommended):
+- With Flask (development):
 
 ```powershell
 set FLASK_APP=my_app.py
@@ -40,23 +50,34 @@ set FLASK_ENV=development
 flask run
 ```
 
-Or run via Python if you add a small `if __name__ == '__main__': app.run()` block.
-
-Tests
-- Tests use `pytest`. They rely on the DB accessible from `get_connection()` and `conftest.py` rolls back changes after each test.
+Or build and run with Docker:
 
 ```powershell
+docker-compose up --build
+```
+
+Testing
+- The test suite uses an in-memory SQLite database in CI and can be run locally in the same mode. To run tests locally with SQLite:
+
+```powershell
+set DB_ENGINE=sqlite
+set DB_PATH=:memory:
 pytest -q
 ```
 
-Notes
-- File uploads are stored under `static/receipts` (auto-created by the app). Update `ALLOWED_EXTENSIONS` in `my_app.py` if needed.
-- The app uses server/trusted connection authentication in `get_connection()` — adapt to use SQL auth or environment variables for production.
-- Secrets: replace `app.secret_key` with a secure secret (use environment variables in production).
+CI
+- GitHub Actions is configured in `.github/workflows/ci.yml`. The workflow runs linting and tests. Tests are enabled and run against an in-memory SQLite DB so no external DB is required.
 
-Contributing
-- Open issues or PRs for improvements, tests, or deployment instructions.
+Pinning
+- `requirements-pinned.txt` contains suggested pinned versions. To produce an exact freeze from your environment run:
 
-License
-- Add a license as appropriate for your project.
-# Expense-tracker
+```powershell
+pip freeze > requirements.txt
+```
+
+Notes & Security
+- Store secrets in `.env` (don't commit it). Use `APP_SECRET` for `app.secret_key` and `DB_*` variables for DB configuration.
+- For production, do not use the development server and ensure strong secrets and secure DB credentials.
+
+License & Contributing
+- See `LICENSE` (MIT) and `CONTRIBUTING.md` for contribution guidelines.
