@@ -1,0 +1,12 @@
+Flask
+Flask-Session
+pyodbc
+werkzeug
+fpdf
+pytest
+
+# Dev / CI
+black
+flake8
+isort
+python-dotenv
