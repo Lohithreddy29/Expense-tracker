@@ -11,6 +11,9 @@ Key files
 Author
 - Lohith Reddy Danda
 
+Acknowledgments
+- With help of Krishna Vamsi Cherukupalli and Phani Krishna Mallampati
+
 Requirements
 - Python 3.9+
 - For production with SQL Server: Microsoft ODBC Driver 17 for SQL Server (or appropriate driver)
